@@ -15,7 +15,7 @@ sub zmq_version(CArray[int], CArray[int], CArray[int]) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_errno (void);
 sub zmq_errno() is native('libzmq') { * }
 # ZMQ_EXPORT const char *zmq_strerror (int errnum);
-sub zmq_strerror(--> Str) is native('libzmq') { * }
+sub zmq_strerror(int --> Str) is native('libzmq') { * }
 
 # ZMQ_EXPORT int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
 my sub zmq_poll(Net::ZMQ::Pollitem, int, Int --> int) is native('libzmq') { * }
