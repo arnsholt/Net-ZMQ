@@ -1,6 +1,10 @@
 use NativeCall;
 class Net::ZMQ::Message is repr('CStruct');
 
+my constant ZMQ_MSG_MORE   = 1;
+my constant ZMQ_MSG_SHARED = 128;
+my constant ZMQ_MSG_MASK   = 129;
+
 has OpaquePointer $!content;
 has int8 $!flags;
 has int8 $!vsm_size;
