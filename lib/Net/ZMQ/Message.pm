@@ -1,6 +1,8 @@
 use NativeCall;
 class Net::ZMQ::Message is repr('CStruct');
 
+use Net::ZMQ::Util;
+
 my constant ZMQ_MSG_MORE   = 1;
 my constant ZMQ_MSG_SHARED = 128;
 my constant ZMQ_MSG_MASK   = 129;
@@ -67,7 +69,7 @@ my sub zmq_msg_size(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # TODO: Public interface methods
 multi submethod BUILD() {
     my $ret = zmq_msg_init(self);
-    # TODO: Check return value and throw exception on error.
+    zmq_die() if $ret != 0;
 }
 
 multi submethod BUILD(:$message!) {

@@ -3,6 +3,7 @@ class Net::ZMQ::Socket is repr('CPointer');
 
 use Net::ZMQ::Context;
 use Net::ZMQ::Message;
+use Net::ZMQ::Util;
 
 # Socket types. These are all #defines.
 my constant ZMQ_PAIR   = 0;
@@ -64,14 +65,13 @@ my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('lib
 
 method new(Net::ZMQ::Context $context, int $type) {
     my $sock = zmq_socket($context, $type);
-    # TODO: Check return value and throw exception if it's the type object
-    # (aka. a null pointer).
+    zmq_die() if not $sock;
     return $sock;
 }
 
 method bind(Str $address) {
     my $ret = zmq_bind(self, $address);
-    # TODO: Check return value and throw exception on error.
+    zmq_die() if $ret != 0;
 }
 
 # TODO: setsockopt/getsockopt. Best way to expose them might be separate
@@ -79,7 +79,7 @@ method bind(Str $address) {
 
 method connect(Str $address) {
     my $ret = zmq_connect(self, $address);
-    # TODO: Check return value and throw exception on error.
+    zmq_die() if $ret != 0;
 }
 
 # TODO: There's probably a more Perlish way to handle the flags.
@@ -89,14 +89,22 @@ multi method send(Str $message, int $flags) {
 
 multi method send(Net::ZMQ::Message $message, int $flags) {
     my $ret = zmq_send(self, $message, $flags);
-    # TODO: Check return value and throw exception on error.
+    zmq_die() if $ret != 0;
 }
 
 method receive(int $flags) {
     my $msg = Net::ZMQ::Message.new;
     my $ret = zmq_recv(self, $msg, $flags);
-    # TODO: Check return value and throw exception on error.
+    zmq_die() if $ret != 0;
     return $msg;
 }
+
+# ZMQ device types. All #defined in zmq.h
+my constant ZMQ_STREAMER  = 1;
+my constant ZMQ_FORWARDER = 2;
+my constant ZMQ_QUEUE     = 3;
+
+# ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
+my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket--> int) is native('libzmq') { * }
 
 # vim: ft=perl6

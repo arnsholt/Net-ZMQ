@@ -13,4 +13,7 @@ has int              $!fd;
 has int16            $!events;
 has int16            $!revents;
 
+# ZMQ_EXPORT int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
+my sub zmq_poll(Net::ZMQ::Pollitem, int, Int --> int) is native('libzmq') { * }
+
 # vim: ft=perl6
