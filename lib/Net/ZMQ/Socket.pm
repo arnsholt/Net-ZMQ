@@ -62,4 +62,41 @@ my sub zmq_send(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('lib
 # ZMQ_EXPORT int zmq_recv (void *s, zmq_msg_t *msg, int flags);
 my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('libzmq') { * }
 
+method new(Net::ZMQ::Context $context, int $type) {
+    my $sock = zmq_socket($context, $type);
+    # TODO: Check return value and throw exception if it's the type object
+    # (aka. a null pointer).
+    return $sock;
+}
+
+method bind(Str $address) {
+    my $ret = zmq_bind(self, $address);
+    # TODO: Check return value and throw exception on error.
+}
+
+# TODO: setsockopt/getsockopt. Best way to expose them might be separate
+# accessors for each property?
+
+method connect(Str $address) {
+    my $ret = zmq_connect(self, $address);
+    # TODO: Check return value and throw exception on error.
+}
+
+# TODO: There's probably a more Perlish way to handle the flags.
+multi method send(Str $message, int $flags) {
+    self.send(Net::ZMQ::Message.new(:message($message)));
+}
+
+multi method send(Net::ZMQ::Message $message, int $flags) {
+    my $ret = zmq_send(self, $message, $flags);
+    # TODO: Check return value and throw exception on error.
+}
+
+method receive(int $flags) {
+    my $msg = Net::ZMQ::Message.new;
+    my $ret = zmq_recv(self, $msg, $flags);
+    # TODO: Check return value and throw exception on error.
+    return $msg;
+}
+
 # vim: ft=perl6
