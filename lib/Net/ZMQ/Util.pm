@@ -3,6 +3,7 @@ module Net::ZMQ::Util;
 use NativeCall;
 
 use Net::ZMQ::Pollitem;
+use X::ZMQ;
 
 my constant ZMQ_HAUSNUMERO  = 156384712;
 my constant EFSM            = (ZMQ_HAUSNUMERO + 51);
@@ -27,5 +28,9 @@ my constant ZMQ_QUEUE     = 3;
 
 # ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
 my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket--> int) is native('libzmq') { * }
+
+my sub zmq_die() is export {
+    X::ZMQ.new(:errno(zmq_errno()), :strerror(zmq_strerror())).throw;
+}
 
 # vim: ft=perl6
