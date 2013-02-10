@@ -65,5 +65,13 @@ my sub zmq_msg_data(Net::ZMQ::Message --> OpaquePointer) is native('libzmq') { *
 my sub zmq_msg_size(Net::ZMQ::Message --> int) is native('libzmq') { * }
 
 # TODO: Public interface methods
+multi submethod BUILD() {
+    my $ret = zmq_msg_init(self);
+    # TODO: Check return value and throw exception on error.
+}
+
+multi submethod BUILD(:$message!) {
+    # TODO: Send appropriate data to zmq_msg_init_data
+}
 
 # vim: ft=perl6
