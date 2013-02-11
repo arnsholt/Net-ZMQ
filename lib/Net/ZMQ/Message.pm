@@ -49,8 +49,8 @@ my sub zmq_msg_init_size(Net::ZMQ::Message, int --> int) is native('libzmq') { *
 # typedef void (zmq_free_fn) (void *data, void *hint);
 # ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 #     size_t size, zmq_free_fn *ffn, void *hint);
-my sub zmq_msg_init_data(Net::ZMQ::Message, OpaquePointer, int,
-    &cb(OpaquePointer, OpaquePointer), OpaquePointer --> int) is native('libzmq') { * }
+my sub zmq_msg_init_data(Net::ZMQ::Message, Str, int,
+    OpaquePointer, OpaquePointer --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_msg_close (zmq_msg_t *msg);
 my sub zmq_msg_close(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_msg_move (zmq_msg_t *dest, zmq_msg_t *src);
@@ -58,7 +58,7 @@ my sub zmq_msg_move(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_msg_copy (zmq_msg_t *dest, zmq_msg_t *src);
 my sub zmq_msg_copy(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # ZMQ_EXPORT void *zmq_msg_data (zmq_msg_t *msg);
-my sub zmq_msg_data(Net::ZMQ::Message --> OpaquePointer) is native('libzmq') { * }
+my sub zmq_msg_data(Net::ZMQ::Message --> Str) is native('libzmq') { * }
 # ZMQ_EXPORT size_t zmq_msg_size (zmq_msg_t *msg);
 my sub zmq_msg_size(Net::ZMQ::Message --> int) is native('libzmq') { * }
 
@@ -69,7 +69,22 @@ multi submethod BUILD() {
 }
 
 multi submethod BUILD(:$message!) {
-    # TODO: Send appropriate data to zmq_msg_init_data
+    # XXX: This is only going to work with ASCII data
+    # XXX: This is going to leak memory without proper lifecycle handling
+    explicitly-manage($message); # TODO: Goes away with better blob handling
+    my $ret = zmq_msg_init_data(self, $message, $message.chars, OpaquePointer,
+        OpaquePointer);
+    zmq_die() if $ret != 0;
+}
+
+# TODO: We'll probably want various methods of accessing the data once we have
+# proper blob handling.
+method data() {
+    return zmq_msg_data(self);
+}
+
+method size() {
+    return zmq_msg_size(self);
 }
 
 # vim: ft=perl6
