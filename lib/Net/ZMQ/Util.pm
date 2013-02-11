@@ -5,7 +5,7 @@ use NativeCall;
 # ZMQ_EXPORT void zmq_version (int *major, int *minor, int *patch);
 sub zmq_version(CArray[int], CArray[int], CArray[int]) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_errno (void);
-sub zmq_errno() is native('libzmq') { * }
+sub zmq_errno(--> int) is native('libzmq') { * }
 # ZMQ_EXPORT const char *zmq_strerror (int errnum);
 sub zmq_strerror(int --> Str) is native('libzmq') { * }
 
