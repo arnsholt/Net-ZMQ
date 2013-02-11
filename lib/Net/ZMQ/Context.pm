@@ -12,15 +12,12 @@ my sub zmq_term(Net::ZMQ::Context --> int) is native('libzmq') { * }
 method new(:$threads = 1) {
     my $ctx = zmq_init($threads);
     zmq_die() if not $ctx;
+    return $ctx;
 }
 
 method terminate() {
     my $ret = zmq_term(self);
     zmq_die() if $ret != 0;
-}
-
-method socket(int $type) {
-    return Net::ZMQ::Socket.new(self, $type);
 }
 
 # vim: ft=perl6
