@@ -2,12 +2,6 @@ module Net::ZMQ::Util;
 
 use NativeCall;
 
-my constant ZMQ_HAUSNUMERO  = 156384712;
-my constant EFSM            = (ZMQ_HAUSNUMERO + 51);
-my constant ENOCOMPATPROTO  = (ZMQ_HAUSNUMERO + 52);
-my constant ETERM           = (ZMQ_HAUSNUMERO + 53);
-my constant EMTHREAD        = (ZMQ_HAUSNUMERO + 54);
-
 # ZMQ_EXPORT void zmq_version (int *major, int *minor, int *patch);
 sub zmq_version(CArray[int], CArray[int], CArray[int]) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_errno (void);

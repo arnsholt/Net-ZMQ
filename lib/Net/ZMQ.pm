@@ -1,5 +1,6 @@
 module Net::ZMQ;
 
+use Net::ZMQ::Constants;
 use Net::ZMQ::Context;
 use Net::ZMQ::Message;
 use Net::ZMQ::Pollitem;

@@ -5,45 +5,6 @@ use Net::ZMQ::Context;
 use Net::ZMQ::Message;
 use Net::ZMQ::Util;
 
-# Socket types. These are all #defines.
-my constant ZMQ_PAIR   = 0;
-my constant ZMQ_PUB    = 1;
-my constant ZMQ_SUB    = 2;
-my constant ZMQ_REQ    = 3;
-my constant ZMQ_REP    = 4;
-my constant ZMQ_DEALER = 5;
-my constant ZMQ_ROUTER = 6;
-my constant ZMQ_PULL   = 7;
-my constant ZMQ_PUSH   = 8;
-my constant ZMQ_XPUB   = 9;
-my constant ZMQ_XSUB   = 10;
-
-# Socket options, likewise.
-my constant ZMQ_HWM               = 1;
-my constant ZMQ_SWAP              = 3;
-my constant ZMQ_AFFINITY          = 4;
-my constant ZMQ_IDENTITY          = 5;
-my constant ZMQ_SUBSCRIBE         = 6;
-my constant ZMQ_UNSUBSCRIBE       = 7;
-my constant ZMQ_RATE              = 8;
-my constant ZMQ_RECOVERY_IVL      = 9;
-my constant ZMQ_MCAST_LOOP        = 10;
-my constant ZMQ_SNDBUF            = 11;
-my constant ZMQ_RCVBUF            = 12;
-my constant ZMQ_RCVMORE           = 13;
-my constant ZMQ_FD                = 14;
-my constant ZMQ_EVENTS            = 15;
-my constant ZMQ_TYPE              = 16;
-my constant ZMQ_LINGER            = 17;
-my constant ZMQ_RECONNECT_IVL     = 18;
-my constant ZMQ_BACKLOG           = 19;
-my constant ZMQ_RECOVERY_IVL_MSEC = 20;
-my constant ZMQ_RECONNECT_IVL_MAX = 21;
-
-# And send/receive options.
-my constant ZMQ_NOBLOCK = 1;
-my constant ZMQ_SNDMORE = 2;
-
 # ZMQ_EXPORT void *zmq_socket (void *context, int type);
 my sub zmq_socket(Net::ZMQ::Context, int --> Net::ZMQ::Socket) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_close (void *s);
@@ -98,11 +59,6 @@ method receive(int $flags) {
     zmq_die() if $ret != 0;
     return $msg;
 }
-
-# ZMQ device types. All #defined in zmq.h
-my constant ZMQ_STREAMER  = 1;
-my constant ZMQ_FORWARDER = 2;
-my constant ZMQ_QUEUE     = 3;
 
 # ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
 my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket--> int) is native('libzmq') { * }
