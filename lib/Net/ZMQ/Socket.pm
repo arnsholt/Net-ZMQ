@@ -45,7 +45,7 @@ method connect(Str $address) {
 
 # TODO: There's probably a more Perlish way to handle the flags.
 multi method send(Str $message, int $flags) {
-    self.send(Net::ZMQ::Message.new(:message($message)));
+    self.send(Net::ZMQ::Message.new(:message($message)), $flags);
 }
 
 multi method send(Net::ZMQ::Message $message, int $flags) {

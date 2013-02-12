@@ -10,6 +10,7 @@ $sock.bind("tcp://127.0.0.1:2910");
 loop {
     say "# Receiving...";
     my $msg = $sock.receive(0);
+    last if not $msg;
     say $msg.data;
 }
 
