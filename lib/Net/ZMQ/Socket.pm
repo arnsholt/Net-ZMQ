@@ -12,7 +12,22 @@ my sub zmq_socket(Net::ZMQ::Context, int --> Net::ZMQ::Socket) is native('libzmq
 my sub zmq_close(Net::ZMQ::Socket --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_setsockopt (void *s, int option, const void *optval,
 #     size_t optvallen); 
-my sub zmq_setsockopt(Net::ZMQ::Socket, int, OpaquePointer, int --> int) is native('libzmq') { * }
+my sub zmq_setsockopt_int(Net::ZMQ::Socket, int, CArray[int], CArray[int] --> int)
+    is native('libzmq')
+    is symbol('zmq_setsockopt')
+    { * }
+my sub zmq_setsockopt_int32(Net::ZMQ::Socket, int, CArray[int32], CArray[int] --> int)
+    is native('libzmq')
+    is symbol('zmq_setsockopt')
+    { * }
+my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int, CArray[int64], CArray[int] --> int)
+    is native('libzmq')
+    is symbol('zmq_setsockopt')
+    { * }
+my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], CArray[int] --> int)
+    is native('libzmq')
+    is symbol('zmq_setsockopt')
+    { * }
 # ZMQ_EXPORT int zmq_getsockopt (void *s, int option, void *optval,
 #     size_t *optvallen);
 # We have several variants of this function, all with different signatures, to
@@ -139,7 +154,46 @@ method getopt($opt) {
     return $val[0];
 }
 
+method setopt($opt, $value) {
+    my CArray[int] $optlen .= new;
+    my $ret;
+
+    my CArray $val;
+    given %opttypes{$opt} {
+        when int {
+            $val = CArray[int].new;
+            $val[0] = int;
+            $optlen[0] = 4;
+            $ret = zmq_setsockopt_int(self, $opt, $val, $optlen);
+        }
+        when int32 {
+            $val = CArray[int32].new;
+            $val[0] = int32;
+            $optlen[0] = 4;
+            $ret = zmq_setsockopt_int32(self, $opt, $val, $optlen);
+        }
+        when int64 {
+            $val = CArray[int64].new;
+            $val[0] = int64;
+            $optlen[0] = 8;
+            $ret = zmq_setsockopt_int64(self, $opt, $val, $optlen);
+        }
+        # TODO: bytes
+        #when "bytes" {
+        #    $val = CArray[int8].new;
+        #    $val[0] = int8;
+        #    $ret = zmq_setsockopt_int8(self, $opt, $val, $optlen);
+        #}
+        default {
+            die "Unknown ZMQ socket option type $opt";
+        }
+    }
+
+    zmq_die() if $ret != 0;
+    return;
+}
+
 # ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
-my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket--> int) is native('libzmq') { * }
+my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket --> int) is native('libzmq') { * }
 
 # vim: ft=perl6
