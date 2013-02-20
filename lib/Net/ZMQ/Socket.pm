@@ -103,28 +103,30 @@ method receive(int $flags) {
 method getopt($opt) {
     my CArray[int] $optlen .= new;
     my $ret;
+
+    my CArray $val;
     given %opttypes{$opt} {
         when int {
-            my CArray[int] $val .= new;
+            $val = CArray[int].new;
             $val[0] = int;
             $optlen[0] = 4;
             $ret = zmq_getsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
-            my CArray[int32] $val .= new;
+            $val = CArray[int32].new;
             $val[0] = int32;
             $optlen[0] = 4;
             $ret = zmq_getsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
-            my CArray[int64] $val .= new;
+            $val = CArray[int64].new;
             $val[0] = int64;
             $optlen[0] = 8;
             $ret = zmq_getsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
         #when "bytes" {
-        #    my CArray[int8] $val .= new;
+        #    $val = CArray[int8].new;
         #    $val[0] = int8;
         #    $ret = zmq_getsockopt_int8(self, $opt, $val, $optlen);
         #}
@@ -134,6 +136,7 @@ method getopt($opt) {
     }
 
     zmq_die() if $ret != 0;
+    return $val[0];
 }
 
 # ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
