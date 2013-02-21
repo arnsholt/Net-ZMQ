@@ -12,19 +12,19 @@ my sub zmq_socket(Net::ZMQ::Context, int --> Net::ZMQ::Socket) is native('libzmq
 my sub zmq_close(Net::ZMQ::Socket --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_setsockopt (void *s, int option, const void *optval,
 #     size_t optvallen); 
-my sub zmq_setsockopt_int(Net::ZMQ::Socket, int, CArray[int], CArray[int] --> int)
+my sub zmq_setsockopt_int(Net::ZMQ::Socket, int, CArray[int], int --> int)
     is native('libzmq')
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_int32(Net::ZMQ::Socket, int, CArray[int32], CArray[int] --> int)
+my sub zmq_setsockopt_int32(Net::ZMQ::Socket, int, CArray[int32], int --> int)
     is native('libzmq')
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int, CArray[int64], CArray[int] --> int)
+my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int, CArray[int64], int --> int)
     is native('libzmq')
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], CArray[int] --> int)
+my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], int --> int)
     is native('libzmq')
     is symbol('zmq_setsockopt')
     { * }
@@ -162,26 +162,26 @@ method setopt($opt, $value) {
     given %opttypes{$opt} {
         when int {
             $val = CArray[int].new;
-            $val[0] = int;
+            $val[0] = $value;
             $optlen[0] = 4;
             $ret = zmq_setsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
-            $val[0] = int32;
+            $val[0] = $value;
             $optlen[0] = 4;
             $ret = zmq_setsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
-            $val[0] = int64;
+            $val[0] = $value;
             $optlen[0] = 8;
             $ret = zmq_setsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
         #when "bytes" {
         #    $val = CArray[int8].new;
-        #    $val[0] = int8;
+        #    $val[0] = $value;
         #    $ret = zmq_setsockopt_int8(self, $opt, $val, $optlen);
         #}
         default {
