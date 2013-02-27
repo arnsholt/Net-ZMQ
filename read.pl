@@ -11,8 +11,8 @@ loop {
     print "Message: ";
     my $msg = $*IN.get;
     my int $flag = 0;
-    last if not $msg;
     $sock.send($msg, $flag);
+    last if not $msg;
 }
 
 # vim: ft=perl6

@@ -11,7 +11,7 @@ loop {
     say "# Receiving...";
     my $msg = $sock.receive(0);
     last if not $msg;
-    say $msg.data;
+    say "`{$msg.data}'";
 }
 
 # vim: ft=perl6
