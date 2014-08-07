@@ -54,10 +54,16 @@ my sub zmq_getsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], CArray[int] -->
 my sub zmq_bind(Net::ZMQ::Socket, Str --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_connect (void *s, const char *addr);
 my sub zmq_connect(Net::ZMQ::Socket, Str --> int) is native('libzmq') { * }
-# ZMQ_EXPORT int zmq_send (void *s, zmq_msg_t *msg, int flags);
-my sub zmq_send(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('libzmq') { * }
-# ZMQ_EXPORT int zmq_recv (void *s, zmq_msg_t *msg, int flags);
-my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('libzmq') { * }
+
+# ZMQ_EXPORT int zmq_send (void *s, void *buf, size_t buflen, int flags);
+my sub zmq_send(Net::ZMQ::Socket, CArray[uint8], int, int --> int) is native('libzmq') { * }
+# ZMQ_EXPORT int zmq_recv (void *s, void *msg, size_t buflen, int flags);
+my sub zmq_recv(Net::ZMQ::Socket, CArray[uint8], int --> int) is native('libzmq') { * }
+
+# ZMQ_EXPORT int zmq_send_msg (void *s, zmq_msg_t *msg, int flags);
+my sub zmq_sendmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('libzmq') { * }
+# ZMQ_EXPORT int zmq_recv_msg (void *s, zmq_msg_t *msg, int flags);
+my sub zmq_recvmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('libzmq') { * }
 
 my %opttypes = ZMQ_BACKLOG, int,
                ZMQ_TYPE, int,
@@ -99,19 +105,29 @@ method connect(Str $address) {
 }
 
 # TODO: There's probably a more Perlish way to handle the flags.
-multi method send(Str $message, $flags) {
-    self.send(Net::ZMQ::Message.new(:message($message)), $flags);
+multi method send(Str $message, $flags = 0) {
+    say "going to send";
+    my $buf = $message.encode("utf8");
+    my $carr = CArray[int8].new;
+    for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; say "$idx $val" }
+    say $buf.perl;
+    say $carr.perl;
+    my $ret = zmq_send(self, $carr, $buf.elems, $flags);
+    say "sent";
+    zmq_die if $ret == -1;
+    return $ret;
 }
 
-multi method send(Net::ZMQ::Message $message, $flags) {
-    my $ret = zmq_send(self, $message, $flags);
-    zmq_die() if $ret != 0;
+multi method send(Net::ZMQ::Message $message, $flags = 0) {
+    my $ret = zmq_sendmsg(self, $message, $flags);
+    zmq_die() if $ret == -1;
+    return $ret;
 }
 
 method receive(int $flags) {
     my $msg = Net::ZMQ::Message.new;
-    my $ret = zmq_recv(self, $msg, $flags);
-    zmq_die() if $ret != 0;
+    my $ret = zmq_recvmsg(self, $msg, $flags);
+    zmq_die() if $ret == -1;
     return $msg;
 }
 

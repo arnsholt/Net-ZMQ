@@ -7,7 +7,7 @@ has OpaquePointer $!content;
 has int8 $!flags;
 has int8 $!vsm_size;
 
-# XXX: Hack, hack, hack!
+# XXX Hack, hack, hack!
 # NativeCall has no way of dealing with flattened arrays yet, so for the time
 # being, we just hack around it by embedding 30 byte members instead of a
 # 30-byte flattened array.
