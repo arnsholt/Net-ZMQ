@@ -106,14 +106,10 @@ method connect(Str $address) {
 
 # TODO: There's probably a more Perlish way to handle the flags.
 multi method send(Str $message, $flags = 0) {
-    say "going to send";
     my $buf = $message.encode("utf8");
     my $carr = CArray[int8].new;
-    for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; say "$idx $val" }
-    say $buf.perl;
-    say $carr.perl;
+    for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; }
     my $ret = zmq_send(self, $carr, $buf.elems, $flags);
-    say "sent";
     zmq_die if $ret == -1;
     return $ret;
 }
@@ -139,19 +135,19 @@ method getopt($opt) {
     given %opttypes{$opt} {
         when int {
             $val = CArray[int].new;
-            $val[0] = int;
+            $val[0] = 0;
             $optlen[0] = 4;
             $ret = zmq_getsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
-            $val[0] = int32;
+            $val[0] = 0;
             $optlen[0] = 4;
             $ret = zmq_getsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
-            $val[0] = int64;
+            $val[0] = 0;
             $optlen[0] = 8;
             $ret = zmq_getsockopt_int64(self, $opt, $val, $optlen);
         }
