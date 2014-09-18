@@ -58,7 +58,7 @@ my sub zmq_msg_move(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # ZMQ_EXPORT int zmq_msg_copy (zmq_msg_t *dest, zmq_msg_t *src);
 my sub zmq_msg_copy(Net::ZMQ::Message --> int) is native('libzmq') { * }
 # ZMQ_EXPORT void *zmq_msg_data (zmq_msg_t *msg);
-my sub zmq_msg_data(Net::ZMQ::Message --> Str) is native('libzmq') { * }
+my sub zmq_msg_data(Net::ZMQ::Message --> CArray[int8]) is native('libzmq') { * }
 # ZMQ_EXPORT size_t zmq_msg_size (zmq_msg_t *msg);
 my sub zmq_msg_size(Net::ZMQ::Message --> int) is native('libzmq') { * }
 
@@ -80,7 +80,12 @@ multi submethod BUILD(:$message!) {
 # TODO: We'll probably want various methods of accessing the data once we have
 # proper blob handling.
 method data() {
-    return zmq_msg_data(self);
+    my $buf = buf8.new;
+    my $zmq_data = zmq_msg_data(self);
+    for 0..^zmq_msg_size(self) {
+        $buf ~= buf8.new($zmq_data[$_]);
+    }
+    return $buf.decode;
 }
 
 method size() {
