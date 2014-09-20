@@ -106,7 +106,10 @@ method connect(Str $address) {
 
 # TODO: There's probably a more Perlish way to handle the flags.
 multi method send(Str $message, $flags = 0) {
-    my $buf = $message.encode("utf8");
+    return self.send($message.encode("utf8"), $flags);
+}
+
+multi method send(Blob $buf, $flags = 0) {
     my $carr = CArray[int8].new;
     for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; }
     my $ret = zmq_send(self, $carr, $buf.elems, $flags);
