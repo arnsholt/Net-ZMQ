@@ -5,7 +5,7 @@ use Test;
 use Net::ZMQ;
 use Net::ZMQ::Constants;
 
-plan 10;
+plan 6;
 
 my Net::ZMQ::Context $ctx .= new();
 pass 'creating context';
@@ -20,16 +20,8 @@ pass 'binding to inproc address';
 $bob.connect('inproc://alice');
 pass 'connecting to inproc address';
 
-$alice.send('foo', 0);
-is $bob.receive(0).data-str(), 'foo', 'sending and receiving simple message';
-
-
-$alice.send('quux', ZMQ_SNDMORE);
-pass 'sending SNDMORE message';
-$alice.send('barf', 0);
-
-is $bob.receive(0).data-str(), 'quux', 'receiving first part of two-part message';
-is $bob.getopt(ZMQ_RCVMORE), 1, 'getting RCVMORE flag';
-is $bob.receive(0).data-str(), 'barf', 'receiving second part of two-parter';
+my $buf = buf8.new(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+$alice.send($buf, 0);
+is $bob.receive(0).data(), $buf, 'sending and receiving simple binary message';
 
 # vim: ft=perl6

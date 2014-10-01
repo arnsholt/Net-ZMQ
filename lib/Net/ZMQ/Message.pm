@@ -77,15 +77,21 @@ multi submethod BUILD(:$message!) {
     zmq_die() if $ret != 0;
 }
 
-# TODO: We'll probably want various methods of accessing the data once we have
-# proper blob handling.
+submethod DESTROY() {
+    zmq_msg_close(self);
+}
+
 method data() {
     my $buf = buf8.new;
     my $zmq_data = zmq_msg_data(self);
     for 0..^zmq_msg_size(self) {
         $buf ~= buf8.new($zmq_data[$_]);
     }
-    return $buf.decode;
+    return $buf;
+}
+
+method data-str() {
+    return $.data.decode;
 }
 
 method size() {
