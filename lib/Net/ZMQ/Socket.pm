@@ -208,7 +208,4 @@ method setopt($opt, $value) {
     return;
 }
 
-# ZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
-my sub zmq_device(int, Net::ZMQ::Socket, Net::ZMQ::Socket --> int) is native('libzmq') { * }
-
 # vim: ft=perl6
