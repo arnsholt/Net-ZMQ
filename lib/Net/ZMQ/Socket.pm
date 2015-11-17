@@ -124,11 +124,11 @@ multi method send(Net::ZMQ::Message $message, $flags = 0) {
 }
 
 multi method send(Str $message, $flags = 0) {
-    self.send: Net::ZMQ::Message.new(:$message);
+    self.send: Net::ZMQ::Message.new(:$message), $flags;
 }
 
 multi method send(buf8 $message, $flags = 0) {
-    self.send: Net::ZMQ::Message.new: data => $message;
+    self.send: Net::ZMQ::Message.new(data => $message), $flags;
 }
 
 method receive(int $flags = 0) {
