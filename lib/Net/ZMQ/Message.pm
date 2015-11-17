@@ -79,9 +79,9 @@ multi submethod BUILD(Str :$message!) {
     zmq_die() if $ret != 0;
 }
 
-has CArray[int8] $!data;
-multi submethod BUILD(buf8 :$data!) {
-    my CArray[int8] $msg .= new;
+has CArray[uint8] $!data;
+multi submethod BUILD(Blob[uint8] :$data!) {
+    my CArray[uint8] $msg .= new;
     $msg[$_] = $data[$_] for 0..^$data.elems;
     my $ret = zmq_msg_init_bytes(self, $msg, $msg.elems, OpaquePointer,
         OpaquePointer);

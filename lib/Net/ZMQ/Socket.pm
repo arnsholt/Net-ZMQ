@@ -127,7 +127,7 @@ multi method send(Str $message, $flags = 0) {
     self.send: Net::ZMQ::Message.new(:$message), $flags;
 }
 
-multi method send(buf8 $message, $flags = 0) {
+multi method send(Blob[uint8] $message, $flags = 0) {
     self.send: Net::ZMQ::Message.new(data => $message), $flags;
 }
 
