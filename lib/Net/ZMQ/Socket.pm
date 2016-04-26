@@ -139,7 +139,7 @@ method receive(int $flags = 0) {
 }
 
 method getopt($opt) {
-    my CArray[int] $optlen .= new;
+    my CArray $optlen = CArray[int].new;
     my $ret;
 
     my CArray $val;
