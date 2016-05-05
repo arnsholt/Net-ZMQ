@@ -7,24 +7,24 @@ use Net::ZMQ::Message;
 use Net::ZMQ::Util;
 
 # ZMQ_EXPORT void *zmq_socket (void *context, int type);
-my sub zmq_socket(Net::ZMQ::Context, int --> Net::ZMQ::Socket) is native('zmq',v5) { * }
+my sub zmq_socket(Net::ZMQ::Context, int32 --> Net::ZMQ::Socket) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_close (void *s);
-my sub zmq_close(Net::ZMQ::Socket --> int) is native('zmq',v5) { * }
+my sub zmq_close(Net::ZMQ::Socket --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_setsockopt (void *s, int option, const void *optval,
 #     size_t optvallen); 
-my sub zmq_setsockopt_int(Net::ZMQ::Socket, int, CArray[int], int --> int)
+my sub zmq_setsockopt_int(Net::ZMQ::Socket, int32, CArray[int32], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_int32(Net::ZMQ::Socket, int, CArray[int32], int --> int)
+my sub zmq_setsockopt_int32(Net::ZMQ::Socket, int32, CArray[int32], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int, CArray[int64], int --> int)
+my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int32, CArray[int64], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], int --> int)
+my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int32, CArray[int8], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
@@ -34,42 +34,42 @@ my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], int --> int)
 # circumvent the type-checking (passing a CArray won't work when the sig says
 # OpaquePointer). Long-term, this should probably be replaced by better
 # functionality for changing pointer types in Zavolaj.
-my sub zmq_getsockopt_int(Net::ZMQ::Socket, int, CArray[int], CArray[int] --> int)
+my sub zmq_getsockopt_int(Net::ZMQ::Socket, int32, CArray[int32], CArray[int32] --> int32)
     is native('zmq',v5)
     is symbol('zmq_getsockopt')
     { * }
-my sub zmq_getsockopt_int32(Net::ZMQ::Socket, int, CArray[int32], CArray[int] --> int)
+my sub zmq_getsockopt_int32(Net::ZMQ::Socket, int32, CArray[int32], CArray[int32] --> int32)
     is native('zmq',v5)
     is symbol('zmq_getsockopt')
     { * }
-my sub zmq_getsockopt_int64(Net::ZMQ::Socket, int, CArray[int64], CArray[int] --> int)
+my sub zmq_getsockopt_int64(Net::ZMQ::Socket, int32, CArray[int64], CArray[int32] --> int32)
     is native('zmq',v5)
     is symbol('zmq_getsockopt')
     { * }
-my sub zmq_getsockopt_bytes(Net::ZMQ::Socket, int, CArray[int8], CArray[int] --> int)
+my sub zmq_getsockopt_bytes(Net::ZMQ::Socket, int32, CArray[int8], CArray[int32] --> int32)
     is native('zmq',v5)
     is symbol('zmq_getsockopt')
     { * }
 # ZMQ_EXPORT int zmq_bind (void *s, const char *addr);
-my sub zmq_bind(Net::ZMQ::Socket, Str --> int) is native('zmq',v5) { * }
+my sub zmq_bind(Net::ZMQ::Socket, Str --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_connect (void *s, const char *addr);
-my sub zmq_connect(Net::ZMQ::Socket, Str --> int) is native('zmq',v5) { * }
+my sub zmq_connect(Net::ZMQ::Socket, Str --> int32) is native('zmq',v5) { * }
 
 # ZMQ_EXPORT int zmq_send (void *s, void *buf, size_t buflen, int flags);
-my sub zmq_send(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
+my sub zmq_send(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv (void *s, void *msg, size_t buflen, int flags);
-my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
+my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
 
 # ZMQ_EXPORT int zmq_send_msg (void *s, zmq_msg_t *msg, int flags);
 #my sub zmq_sendmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv_msg (void *s, zmq_msg_t *msg, int flags);
 #my sub zmq_recvmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
 
-my %opttypes = ZMQ_BACKLOG, int,
-               ZMQ_TYPE, int,
-               ZMQ_LINGER, int,
-               ZMQ_RECONNECT_IVL, int,
-               ZMQ_RECONNECT_IVL_MAX, int,
+my %opttypes = ZMQ_BACKLOG, int32,
+               ZMQ_TYPE, int32,
+               ZMQ_LINGER, int32,
+               ZMQ_RECONNECT_IVL, int32,
+               ZMQ_RECONNECT_IVL_MAX, int32,
 
                ZMQ_AFFINITY, int64,
                ZMQ_RCVMORE, int64,
@@ -145,7 +145,7 @@ method getopt($opt) {
     my CArray $val;
     given %opttypes{$opt} {
         when int {
-            $val = CArray[int].new;
+            $val = CArray[int32].new;
             $val[0] = 0;
             $optlen[0] = 4;
             $ret = zmq_getsockopt_int(self, $opt, $val, $optlen);
@@ -178,13 +178,13 @@ method getopt($opt) {
 }
 
 method setopt($opt, $value) {
-    my CArray[int] $optlen .= new;
+    my CArray $optlen = CArray[int32].new;
     my $ret;
 
     my CArray $val;
     given %opttypes{$opt} {
         when int {
-            $val = CArray[int].new;
+            $val = CArray[int32].new;
             $val[0] = $value;
             $optlen[0] = 4;
             $ret = zmq_setsockopt_int(self, $opt, $val, $optlen);
