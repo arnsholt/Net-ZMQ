@@ -92,7 +92,6 @@ method close() {
     zmq_msg_close(self);
 }
 submethod DESTROY() {
-    say "destroy";
     zmq_msg_close(self);
 }
 
