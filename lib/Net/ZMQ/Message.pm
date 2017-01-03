@@ -43,26 +43,26 @@ has int8 $!vsm_data28;
 has int8 $!vsm_data29;
 
 # ZMQ_EXPORT int zmq_msg_init (zmq_msg_t *msg);
-my sub zmq_msg_init(Net::ZMQ::Message --> int) is native('zmq',v5) { * }
+my sub zmq_msg_init(Net::ZMQ::Message --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_msg_init_size (zmq_msg_t *msg, size_t size);
-my sub zmq_msg_init_size(Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
+my sub zmq_msg_init_size(Net::ZMQ::Message, int64 --> int32) is native('zmq',v5) { * }
 # typedef void (zmq_free_fn) (void *data, void *hint);
 # ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 #     size_t size, zmq_free_fn *ffn, void *hint);
-my sub zmq_msg_init_data(Net::ZMQ::Message, Str, int,
-    OpaquePointer, OpaquePointer --> int) is native('zmq',v5) { * }
-my sub zmq_msg_init_bytes(Net::ZMQ::Message, CArray[int8], int,
-    OpaquePointer, OpaquePointer --> int) is native('zmq',v5) is symbol('zmq_msg_init_data') { * }
+my sub zmq_msg_init_data(Net::ZMQ::Message, Str, int32,
+    OpaquePointer, OpaquePointer --> int32) is native('zmq',v5) { * }
+my sub zmq_msg_init_bytes(Net::ZMQ::Message, CArray[int8], int32,
+    OpaquePointer, OpaquePointer --> int32) is native('zmq',v5) is symbol('zmq_msg_init_data') { * }
 # ZMQ_EXPORT int zmq_msg_close (zmq_msg_t *msg);
-my sub zmq_msg_close(Net::ZMQ::Message --> int) is native('zmq',v5) { * }
+my sub zmq_msg_close(Net::ZMQ::Message --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_msg_move (zmq_msg_t *dest, zmq_msg_t *src);
-my sub zmq_msg_move(Net::ZMQ::Message --> int) is native('zmq',v5) { * }
+my sub zmq_msg_move(Net::ZMQ::Message --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_msg_copy (zmq_msg_t *dest, zmq_msg_t *src);
-my sub zmq_msg_copy(Net::ZMQ::Message --> int) is native('zmq',v5) { * }
+my sub zmq_msg_copy(Net::ZMQ::Message --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT void *zmq_msg_data (zmq_msg_t *msg);
 my sub zmq_msg_data(Net::ZMQ::Message --> CArray[int8]) is native('zmq',v5) { * }
 # ZMQ_EXPORT size_t zmq_msg_size (zmq_msg_t *msg);
-my sub zmq_msg_size(Net::ZMQ::Message --> int) is native('zmq',v5) { * }
+my sub zmq_msg_size(Net::ZMQ::Message --> int64) is native('zmq',v5) { * }
 
 # TODO: Public interface methods
 multi submethod BUILD() {
@@ -88,7 +88,11 @@ multi submethod BUILD(Blob[uint8] :$data!) {
     zmq_die() if $ret != 0;
 }
 
+method close() {
+    zmq_msg_close(self);
+}
 submethod DESTROY() {
+    say "destroy";
     zmq_msg_close(self);
 }
 
