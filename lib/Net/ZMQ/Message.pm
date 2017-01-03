@@ -70,7 +70,7 @@ multi submethod BUILD() {
     zmq_die() if $ret != 0;
 }
 
-multi submethod BUILD(Str :$message!) {
+multi submethod BUILD(Str :$message! is copy) {
     # XXX: This is only going to work with ASCII data
     # XXX: This is going to leak memory without proper lifecycle handling
     explicitly-manage($message); # TODO: Goes away with better blob handling

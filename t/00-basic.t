@@ -23,7 +23,6 @@ pass 'connecting to inproc address';
 $alice.send('foo', 0);
 is $bob.receive(0).data-str(), 'foo', 'sending and receiving simple message';
 
-
 $alice.send('quux', ZMQ_SNDMORE);
 pass 'sending SNDMORE message';
 $alice.send('barf', 0);

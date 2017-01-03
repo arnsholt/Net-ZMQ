@@ -11,7 +11,7 @@ my sub zmq_socket(Net::ZMQ::Context, int32 --> Net::ZMQ::Socket) is native('zmq'
 # ZMQ_EXPORT int zmq_close (void *s);
 my sub zmq_close(Net::ZMQ::Socket --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_setsockopt (void *s, int option, const void *optval,
-#     size_t optvallen); 
+#     size_t optvallen);
 my sub zmq_setsockopt_int(Net::ZMQ::Socket, int32, CArray[int32], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
@@ -58,12 +58,12 @@ my sub zmq_connect(Net::ZMQ::Socket, Str --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_send (void *s, void *buf, size_t buflen, int flags);
 my sub zmq_send(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv (void *s, void *msg, size_t buflen, int flags);
-my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
+my sub zmq_recv(Net::ZMQ::Socket, Net::ZMQ::Message is rw, int32 --> int32) is native('zmq',v5) { * }
 
 # ZMQ_EXPORT int zmq_send_msg (void *s, zmq_msg_t *msg, int flags);
-#my sub zmq_sendmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
+my sub zmq_sendmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv_msg (void *s, zmq_msg_t *msg, int flags);
-#my sub zmq_recvmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int --> int) is native('zmq',v5) { * }
+my sub zmq_recvmsg(Net::ZMQ::Socket, Net::ZMQ::Message, int32 --> int32) is native('zmq',v5) { * }
 
 my %opttypes = ZMQ_BACKLOG, int32,
                ZMQ_TYPE, int32,
@@ -118,7 +118,7 @@ method connect(Str $address) {
 #}
 
 multi method send(Net::ZMQ::Message $message, $flags = 0) {
-    my $ret = zmq_send(self, $message, $flags);
+    my $ret = zmq_sendmsg(self, $message, $flags);
     zmq_die() if $ret == -1;
     return $ret;
 }
@@ -133,7 +133,7 @@ multi method send(Blob[uint8] $message, $flags = 0) {
 
 method receive(int $flags = 0) {
     my $msg = Net::ZMQ::Message.new;
-    my $ret = zmq_recv(self, $msg, $flags);
+    my $ret = zmq_recvmsg(self, $msg, $flags);
     zmq_die() if $ret == -1;
     return $msg;
 }
