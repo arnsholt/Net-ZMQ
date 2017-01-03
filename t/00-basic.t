@@ -21,14 +21,20 @@ $bob.connect('inproc://alice');
 pass 'connecting to inproc address';
 
 $alice.send('foo', 0);
-is $bob.receive(0).data-str(), 'foo', 'sending and receiving simple message';
+ok my $msg = $bob.receive(0), "receive the data";
+is $msg.data-str(), 'foo', 'sending and receiving simple message';
+$msg.close;
 
 $alice.send('quux', ZMQ_SNDMORE);
 pass 'sending SNDMORE message';
 $alice.send('barf', 0);
 
-is $bob.receive(0).data-str(), 'quux', 'receiving first part of two-part message';
+ok $msg =  $bob.receive(0), "get the message";
+is $msg.data-str(), 'quux', 'receiving first part of two-part message';
+$msg.close;
 is $bob.getopt(ZMQ_RCVMORE), 1, 'getting RCVMORE flag';
-is $bob.receive(0).data-str(), 'barf', 'receiving second part of two-parter';
+ok $msg =  $bob.receive(0), "get the second part of the message";
+is $msg.data-str(), 'barf', 'receiving second part of two-parter';
+$msg.close;
 
 # vim: ft=perl6
