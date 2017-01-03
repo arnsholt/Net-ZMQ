@@ -5,7 +5,7 @@ use Test;
 use Net::ZMQ;
 use Net::ZMQ::Constants;
 
-plan 10;
+plan 13;
 
 my Net::ZMQ::Context $ctx .= new();
 pass 'creating context';
