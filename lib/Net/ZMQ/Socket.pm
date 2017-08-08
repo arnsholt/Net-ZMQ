@@ -24,7 +24,7 @@ my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int32, CArray[int64], int32 --> in
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int32, CArray[int8], int32 --> int32)
+my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int32, CArray[uint8], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
@@ -75,6 +75,8 @@ my %opttypes = ZMQ_BACKLOG, int32,
                ZMQ_RCVMORE, int64,
                ZMQ_HWM, int64,
                ZMQ_SWAP, int64,
+               ZMQ_SUBSCRIBE, "bytes",
+               ZMQ_UNSUBSCRIBE, "bytes",
                ZMQ_RATE, int64,
                ZMQ_RECOVERY_IVL, int64,
                ZMQ_RECOVERY_IVL_MSEC, int64,
@@ -209,11 +211,14 @@ method setopt($opt, $value) {
             $ret = zmq_setsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
-        #when "bytes" {
-        #    $val = CArray[int8].new;
-        #    $val[0] = $value;
-        #    $ret = zmq_setsockopt_int8(self, $opt, $val, $optlen);
-        #}
+        when "bytes" {
+           $val = CArray[uint8].new;
+           # Memory allocation
+           $val[$value.elems - 1] = 0;
+           die "Send Blob to use $opt" unless $value ~~ Blob;
+           for @$value.kv -> $i, $_ { $val[$i] = $_ }
+           $ret = zmq_setsockopt_bytes(self, $opt, $val, $value.elems);
+        }
         default {
             die "Unknown ZMQ socket option type $opt";
         }
