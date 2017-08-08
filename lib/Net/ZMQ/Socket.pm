@@ -81,6 +81,8 @@ my %opttypes = ZMQ_BACKLOG, int32,
                ZMQ_MCAST_LOOP, int64,
                ZMQ_SNDBUF, int64,
                ZMQ_RCVBUF, int64,
+               ZMQ_SNDHWM, int,
+               ZMQ_RCVHWM, int,
 
                ZMQ_IDENTITY, "bytes",
                ZMQ_EVENTS, int32;
@@ -144,7 +146,7 @@ method receive(int $flags = 0) {
 }
 
 method getopt($opt) {
-    my CArray $optlen = CArray[int].new;
+    my size_t $optlen;
     my $ret;
 
     my CArray $val;
@@ -152,19 +154,19 @@ method getopt($opt) {
         when int {
             $val = CArray[int32].new;
             $val[0] = 0;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_getsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
             $val[0] = 0;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_getsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
             $val[0] = 0;
-            $optlen[0] = 8;
+            $optlen = 8;
             $ret = zmq_getsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
@@ -183,7 +185,7 @@ method getopt($opt) {
 }
 
 method setopt($opt, $value) {
-    my CArray $optlen = CArray[int32].new;
+    my size_t $optlen;
     my $ret;
 
     my CArray $val;
@@ -191,19 +193,19 @@ method setopt($opt, $value) {
         when int {
             $val = CArray[int32].new;
             $val[0] = $value;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_setsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
             $val[0] = $value;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_setsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
             $val[0] = $value;
-            $optlen[0] = 8;
+            $optlen = 8;
             $ret = zmq_setsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
