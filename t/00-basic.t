@@ -39,6 +39,6 @@ $msg.close;
 
 $alice.close;
 $bob.close;
-# $ctx.terminate;
+$ctx.terminate;
 
 # vim: ft=perl6
