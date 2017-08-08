@@ -37,4 +37,7 @@ ok $msg =  $bob.receive(0), "get the second part of the message";
 is $msg.data-str(), 'barf', 'receiving second part of two-parter';
 $msg.close;
 
+$alice.close;
+$bob.close;
+
 # vim: ft=perl6

@@ -104,6 +104,11 @@ method connect(Str $address) {
     zmq_die() if $ret != 0;
 }
 
+method close() {
+    my $ret = zmq_close(self);
+    zmq_die() if $ret != 0;
+}
+
 # TODO: There's probably a more Perlish way to handle the flags.
 #multi method send(Str $message, $flags = 0) {
 #    return self.send($message.encode("utf8"), $flags);
