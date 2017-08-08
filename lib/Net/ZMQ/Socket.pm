@@ -146,7 +146,7 @@ method receive(int $flags = 0) {
 }
 
 method getopt($opt) {
-    my size_t $optlen;
+    my $optlen = CArray[int32].new;
     my $ret;
 
     my CArray $val;
@@ -154,19 +154,19 @@ method getopt($opt) {
         when int {
             $val = CArray[int32].new;
             $val[0] = 0;
-            $optlen = 4;
+            $optlen[0] = 4;
             $ret = zmq_getsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
             $val[0] = 0;
-            $optlen = 4;
+            $optlen[0] = 4;
             $ret = zmq_getsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
             $val[0] = 0;
-            $optlen = 8;
+            $optlen[0] = 8;
             $ret = zmq_getsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
