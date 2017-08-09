@@ -87,7 +87,8 @@ my %opttypes = ZMQ_BACKLOG, int32,
                ZMQ_RCVHWM, int,
 
                ZMQ_IDENTITY, "bytes",
-               ZMQ_EVENTS, int32;
+               ZMQ_EVENTS, int32,
+               ZMQ_XPUB_MANUAL, int32;
 
 method new(Net::ZMQ::Context $context, int $type) {
     my $sock = zmq_socket($context, $type);
