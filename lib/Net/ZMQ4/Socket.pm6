@@ -178,11 +178,30 @@ multi method send(Blob[uint8] $message, $flags = 0) {
     self.send: Net::ZMQ4::Message.new(data => $message), $flags;
 }
 
+method sendmore(*@parts) {
+    loop (my $i = 0; $i < @parts.elems; $i++) {
+        my $part = @parts[$i] ~~ Str ?? @parts[$i].encode !! @parts[$i];
+        self.send($part, $i+1 == @parts.elems ?? 0 !! ZMQ_SNDMORE);
+    }
+}
+
 method receive(int32 $flags = 0) {
     my $msg = Net::ZMQ4::Message.new;
     my $ret = zmq_recvmsg(self, $msg, $flags);
     zmq_die() if $ret == -1;
     return $msg;
+}
+
+method receivemore() {
+    my @parts;
+    loop {
+        my $msg = self.receive(0);
+        @parts.push: $msg.data;
+        $msg.close;
+        unless self.getopt(ZMQ_RCVMORE) == 1 {
+            return @parts;
+        }
+    }
 }
 
 method getopt($opt) {
@@ -215,7 +234,7 @@ method getopt($opt) {
     }
 
     zmq_die() if $ret != 0;
-    return $val[0];
+    $val[0];
 }
 
 method setopt($opt, $value) {
@@ -250,7 +269,4 @@ method setopt($opt, $value) {
     }
 
     zmq_die() if $ret != 0;
-    return;
 }
-
-# vim: ft=perl6
