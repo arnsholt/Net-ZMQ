@@ -34,7 +34,11 @@ method set($option, $value) {
 }
 
 method term() {
-    zmq_die() if zmq_ctx_term(self) != 0;
+    # XXX a race is definetely here
+    if $instance {
+        zmq_die() if zmq_ctx_term(self) != 0;
+        $instance = Nil;
+    }
 }
 
 method shutdown() {
