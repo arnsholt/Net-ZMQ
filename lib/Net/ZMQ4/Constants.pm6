@@ -40,6 +40,7 @@ our constant ZMQ_LINGER                   is export(:DEFAULT, :socket-options) =
 our constant ZMQ_RECONNECT_IVL            is export(:DEFAULT, :socket-options) = 18;
 our constant ZMQ_BACKLOG                  is export(:DEFAULT, :socket-options) = 19;
 our constant ZMQ_RECONNECT_IVL_MAX        is export(:DEFAULT, :socket-options) = 21;
+our constant ZMQ_MAXMSGSIZE               is export(:DEFAULT, :socket-options) = 22;
 our constant ZMQ_SNDHWM                   is export(:DEFAULT, :socket-options) = 23;
 our constant ZMQ_RCVHWM                   is export(:DEFAULT, :socket-options) = 24;
 our constant ZMQ_MULTICAST_HOPS           is export(:DEFAULT, :socket-options) = 25;
