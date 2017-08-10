@@ -1,5 +1,5 @@
 # All the various constants that are #defined in zmq.h
-unit module Net::ZMQ::Constants;
+unit module Net::ZMQ4::Constants;
 
 # Context options
 our constant ZMQ_IO_THREADS          is export(:DEFAULT, :context) = 1;
