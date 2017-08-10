@@ -1,7 +1,7 @@
 {
     "perl" : "6.*",
     "name" : "Net::ZMQ",
-    "version" : "0.5",
+    "version" : "0.8",
     "authors" : ["Arne Skjærholt", "github:Altai-man"],
     "description" : "ZeroMQ bindings for Perl6",
     "provides" : {
