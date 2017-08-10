@@ -19,11 +19,11 @@ has int64 $!vsm_data7;
 # ZMQ_EXPORT int zmq_msg_init (zmq_msg_t *msg);
 my sub zmq_msg_init(Net::ZMQ4::Message --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_msg_init_size (zmq_msg_t *msg, size_t size);
-my sub zmq_msg_init_size(Net::ZMQ4::Message, int64 --> int32) is native('zmq',v5) { * }
+my sub zmq_msg_init_size(Net::ZMQ4::Message, size_t --> int32) is native('zmq',v5) { * }
 # typedef void (zmq_free_fn) (void *data, void *hint);
 # ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 #     size_t size, zmq_free_fn *ffn, void *hint);
-my sub zmq_msg_init_data(Net::ZMQ4::Message, Str, int32,
+my sub zmq_msg_init_data(Net::ZMQ4::Message, Str, size_t,
     OpaquePointer, OpaquePointer --> int32) is native('zmq',v5) { * }
 my sub zmq_msg_init_bytes(Net::ZMQ4::Message, CArray[int8], int32,
     OpaquePointer, OpaquePointer --> int32) is native('zmq',v5) is symbol('zmq_msg_init_data') { * }
@@ -79,11 +79,9 @@ method data() {
 }
 
 method data-str() {
-    return $.data.decode;
+    $.data.decode;
 }
 
 method size() {
-    return zmq_msg_size(self);
+    zmq_msg_size(self);
 }
-
-# vim: ft=perl6
