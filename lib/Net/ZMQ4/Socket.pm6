@@ -192,17 +192,18 @@ method receive(int32 $flags = 0) {
     return $msg;
 }
 
-method receivemore() {
-    my @parts;
-    loop {
-        my $msg = self.receive(0);
-        @parts.push: $msg.data;
-        $msg.close;
-        unless self.getopt(ZMQ_RCVMORE) == 1 {
-            return @parts;
-        }
-    }
-}
+# TODO gives incorrect results sometimes, valgrind inspection is needed
+# method receivemore() {
+#     my @parts;
+#     loop {
+#         my $msg = self.receive(0);
+#         @parts.push: $msg.data;
+#         $msg.close;
+#         unless self.getopt(ZMQ_RCVMORE) == 1 {
+#             return @parts;
+#         }
+#     }
+# }
 
 method getopt($opt) {
     my $optlen = CArray[int32].new;
