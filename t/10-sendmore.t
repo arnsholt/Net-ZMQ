@@ -13,20 +13,11 @@ $bob.connect('inproc://alice');
 
 $alice.sendmore('My', 'First', 'Message');
 
-my $res;
+my $res = $bob.receivemore;
 
-loop {
-    my $msg = $bob.receive(0);
-    $res.push: $msg.data;
-    $msg.close;
-    unless $bob.getopt(ZMQ_RCVMORE) == 1 {
-        last;
-    }
-}
-
-ok $res[0] eq Buf[uint8].new(77,121), 'Part 1';
-ok $res[1] eq Buf[uint8].new(70,105,114,115,116), 'Part 2';
-ok $res[2] eq Buf[uint8].new(77,101,115,115,97,103,101), 'Part 3';
+ok $res[0] eqv Buf[uint8].new(77,121), 'Part 1';
+ok $res[1] eqv Buf[uint8].new(70,105,114,115,116), 'Part 2';
+ok $res[2] eqv Buf[uint8].new(77,101,115,115,97,103,101), 'Part 3';
 
 $alice.close;
 $bob.close;
