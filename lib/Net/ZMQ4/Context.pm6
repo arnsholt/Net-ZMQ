@@ -16,8 +16,11 @@ my sub zmq_ctx_set(Net::ZMQ4::Context, int32, int32 --> int32) is native('zmq', 
 my sub zmq_ctx_get(Net::ZMQ4::Context, int32 --> int32) is native('zmq', v5) { * }
 
 my $instance;
+my $lock;
+
 method new() {
     return $instance if $instance;
+    $lock = Lock.new;
     $instance = zmq_ctx_new();
     zmq_die() unless $instance;
     $instance;
@@ -34,11 +37,14 @@ method set($option, $value) {
 }
 
 method term() {
-    # XXX a race is definetely here
-    if $instance {
-        zmq_die() if zmq_ctx_term(self) != 0;
-        $instance = Nil;
-    }
+    $lock.protect(
+        {
+            if $instance {
+                zmq_die() if zmq_ctx_term(self) != 0;
+                $instance = Nil;
+            }
+        }
+    )
 }
 
 method shutdown() {
