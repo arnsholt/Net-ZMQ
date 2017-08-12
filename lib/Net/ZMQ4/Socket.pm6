@@ -57,6 +57,8 @@ my sub zmq_sendmsg(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is na
 # ZMQ_EXPORT int zmq_recv_msg (void *s, zmq_msg_t *msg, int flags);
 my sub zmq_recvmsg(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is native('zmq',v5) { * }
 
+my $lock = Lock.new;
+
 my %opttypes = ZMQ_AFFINITY, int64,
                ZMQ_BACKLOG, int32,
                ZMQ_CONFLATE, int32,
@@ -128,9 +130,14 @@ my %opttypes = ZMQ_AFFINITY, int64,
                ZMQ_ZAP_DOMAIN, "bytes";
 
 method new(Net::ZMQ4::Context $context, int32 $type) {
-    my $sock = zmq_socket($context, $type);
-    zmq_die() if not $sock;
-    return $sock;
+    $lock.protect(
+        {
+            my $sock = zmq_socket($context, $type);
+            zmq_die() if not $sock;
+            $context-count++;
+            $sock;
+        }
+    )
 }
 
 method bind(Str $address) {
@@ -147,8 +154,13 @@ method connect(Str $address) {
 }
 
 method close() {
-    my $ret = zmq_close(self);
-    zmq_die() if $ret != 0;
+    $lock.protect(
+        {
+            my $ret = zmq_close(self);
+            zmq_die() if $ret != 0;
+            $context-count--;
+        }
+    )
 }
 
 # TODO: There's probably a more Perlish way to handle the flags.
@@ -192,9 +204,6 @@ method receive(int32 $flags = 0) {
     return $msg;
 }
 
-my $lock = Lock.new;
-
-# TODO gives incorrect results sometimes, valgrind inspection is needed
 method receivemore() {
     $lock.protect(
         {

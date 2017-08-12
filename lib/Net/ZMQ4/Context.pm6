@@ -39,7 +39,7 @@ method set($option, $value) {
 method term() {
     $lock.protect(
         {
-            if $instance {
+            if $instance && $context-count == 0 {
                 zmq_die() if zmq_ctx_term(self) != 0;
                 $instance = Nil;
             }

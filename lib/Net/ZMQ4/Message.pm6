@@ -65,9 +65,6 @@ multi submethod BUILD(Blob[uint8] :$data!) {
 method close() {
     zmq_msg_close(self);
 }
-submethod DESTROY() {
-    zmq_msg_close(self);
-}
 
 method data() {
     my $buf = buf8.new;

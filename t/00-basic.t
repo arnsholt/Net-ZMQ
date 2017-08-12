@@ -10,9 +10,9 @@ plan 13;
 my Net::ZMQ4::Context $ctx .= new();
 pass 'creating context';
 
-my Net::ZMQ4::Socket $alice .= new($ctx, ZMQ_PAIR); #Net::ZMQ::Constants::ZMQ_PAIR);
+my Net::ZMQ4::Socket $alice .= new($ctx, ZMQ_PAIR);
 pass 'creating socket - imported constant';
-my Net::ZMQ4::Socket $bob .= new($ctx, Net::ZMQ4::Constants::ZMQ_PAIR); #Net::ZMQ::Constants::ZMQ_PAIR);
+my Net::ZMQ4::Socket $bob .= new($ctx, Net::ZMQ4::Constants::ZMQ_PAIR);
 pass 'creating socket - namespaced constant';
 
 $alice.bind('inproc://alice');

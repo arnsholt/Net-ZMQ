@@ -23,4 +23,6 @@ my sub zmq_die() is export {
     X::ZMQ.new(:errno($no), :strerror(zmq_strerror($no))).throw;
 }
 
+our $context-count is export = 0;
+
 # vim: ft=perl6
