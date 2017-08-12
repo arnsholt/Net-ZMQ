@@ -130,14 +130,15 @@ my %opttypes = ZMQ_AFFINITY, int64,
                ZMQ_ZAP_DOMAIN, "bytes";
 
 method new(Net::ZMQ4::Context $context, int32 $type) {
-    $lock.protect(
-        {
+    # TODO investigate the reason of hang because of this lock
+    # $lock.protect(
+        # {
             my $sock = zmq_socket($context, $type);
             zmq_die() if not $sock;
             $context-count++;
-            $sock;
-        }
-    )
+            return $sock;
+    #     }
+    # )
 }
 
 method bind(Str $address) {
