@@ -51,11 +51,10 @@ my sub zmq_connect(Net::ZMQ4::Socket, Str --> int32) is native('zmq',v5) { * }
 my sub zmq_send(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv (void *s, void *msg, size_t buflen, int flags);
 my sub zmq_recv(Net::ZMQ4::Socket, Net::ZMQ4::Message is rw, int32 --> int32) is native('zmq',v5) { * }
-
-# ZMQ_EXPORT int zmq_send_msg (void *s, zmq_msg_t *msg, int flags);
-my sub zmq_sendmsg(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is native('zmq',v5) { * }
-# ZMQ_EXPORT int zmq_recv_msg (void *s, zmq_msg_t *msg, int flags);
-my sub zmq_recvmsg(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is native('zmq',v5) { * }
+# ZMQ_EXPORT int zmq_msg_send (zmq_msg_t *msg, void *s, int flags);
+my sub zmq_msg_send(Net::ZMQ4::Message, Net::ZMQ4::Socket, int32 --> int32) is native('zmq',v5) { * }
+# ZMQ_EXPORT int zmq_msg_recv (zmq_msg_t *msg, void *s, int flags);
+my sub zmq_msg_recv(Net::ZMQ4::Message is rw, Net::ZMQ4::Socket, int32 --> int32) is native('zmq',v5) { * }
 
 my $lock = Lock.new;
 
@@ -178,7 +177,7 @@ method close() {
 #}
 
 multi method send(Net::ZMQ4::Message $message, $flags = 0) {
-    my $ret = zmq_sendmsg(self, $message, $flags);
+    my $ret = zmq_msg_send($message, self, $flags);
     zmq_die() if $ret == -1;
     return $ret;
 }
@@ -200,7 +199,7 @@ method sendmore(*@parts) {
 
 method receive(int32 $flags = 0) {
     my $msg = Net::ZMQ4::Message.new;
-    my $ret = zmq_recvmsg(self, $msg, $flags);
+    my $ret = zmq_msg_recv($msg, self, $flags);
     zmq_die() if $ret == -1;
     return $msg;
 }

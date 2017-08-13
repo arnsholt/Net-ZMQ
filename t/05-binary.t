@@ -32,3 +32,5 @@ ok $bob.receive(0).data() eqv $buf, 'sending and receiving simple binary message
 $alice.close;
 $bob.close;
 $ctx.term;
+
+done-testing;
