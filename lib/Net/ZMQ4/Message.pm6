@@ -37,6 +37,8 @@ my sub zmq_msg_copy(Net::ZMQ4::Message --> int32) is native('zmq',v5) { * }
 my sub zmq_msg_data(Net::ZMQ4::Message --> CArray[int8]) is native('zmq',v5) { * }
 # ZMQ_EXPORT size_t zmq_msg_size (zmq_msg_t *msg);
 my sub zmq_msg_size(Net::ZMQ4::Message --> int64) is native('zmq',v5) { * }
+# ZMQ_EXPORT int zmq_msg_more (const zmq_msg_t *msg);
+my sub zmq_msg_more(Net::ZMQ4::Message --> int32) is native('zmq',v5) { * }
 
 # TODO: Public interface methods
 multi submethod BUILD() {
@@ -65,6 +67,8 @@ multi submethod BUILD(Blob[uint8] :$data!) {
 method close() {
     zmq_msg_close(self);
 }
+
+method more(--> Bool) { zmq_msg_more(self) > 0 }
 
 method data() {
     my $buf = buf8.new;

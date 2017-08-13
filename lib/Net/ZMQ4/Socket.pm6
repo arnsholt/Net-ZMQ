@@ -212,9 +212,7 @@ method receivemore() {
                 my $msg = self.receive(0);
                 @parts.push: $msg.data;
                 $msg.close;
-                unless self.getopt(ZMQ_RCVMORE) == 1 {
-                    return @parts;
-                }
+                unless $msg.more { return @parts }
             }
         }
     );
