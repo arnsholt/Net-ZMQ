@@ -128,16 +128,16 @@ my %opttypes = ZMQ_AFFINITY, int64,
                ZMQ_XPUB_WELCOME_MSG, "bytes",
                ZMQ_ZAP_DOMAIN, "bytes";
 
-method new(Net::ZMQ4::Context $context, int32 $type) {
-    # TODO investigate the reason of hang because of this lock
-    # $lock.protect(
-    #     {
+method new(Net::ZMQ4::Context $context, int32 $type, :$linger = 100) {
+    $lock.protect(
+        {
             my $sock = zmq_socket($context, $type);
+            $sock.setopt(ZMQ_LINGER, $linger);
             zmq_die() if not $sock;
             $context-count++;
             return $sock;
-    #     }
-    # )
+        }
+    )
 }
 
 method bind(Str $address) {
@@ -190,17 +190,13 @@ method receive(int32 $flags = 0) {
 }
 
 method receivemore() {
-    $lock.protect(
-        {
-            my @parts;
-            loop {
-                my $msg = self.receive(0);
-                @parts.push: $msg.data;
-                $msg.close;
-                unless $msg.more { return @parts }
-            }
-        }
-    );
+    my @parts;
+    loop {
+        my $msg = self.receive(0);
+        @parts.push: $msg.data;
+        $msg.close;
+        unless $msg.more { return @parts }
+    }
 }
 
 method getopt($opt) {
