@@ -25,9 +25,6 @@ ok my $msg = $bob.receive(0), "receive the data";
 is $msg.data-str(), 'foo', 'sending and receiving simple message';
 $msg.close;
 
-# Works
-# $alice.sendmore('quux', 'barf');
-# Hangs.
 $alice.send('quux', ZMQ_SNDMORE);
 pass 'sending SNDMORE message';
 $alice.send('barf', 0);

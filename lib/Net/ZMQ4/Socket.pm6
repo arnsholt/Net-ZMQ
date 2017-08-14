@@ -48,7 +48,7 @@ my sub zmq_bind(Net::ZMQ4::Socket, Str --> int32) is native('zmq',v5) { * }
 my sub zmq_connect(Net::ZMQ4::Socket, Str --> int32) is native('zmq',v5) { * }
 
 # ZMQ_EXPORT int zmq_send (void *s, void *buf, size_t buflen, int flags);
-my sub zmq_send(Net::ZMQ4::Socket, Net::ZMQ4::Message, int32 --> int32) is native('zmq',v5) { * }
+my sub zmq_send(Net::ZMQ4::Socket, CArray[int8], size_t, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_recv (void *s, void *msg, size_t buflen, int flags);
 my sub zmq_recv(Net::ZMQ4::Socket, Net::ZMQ4::Message is rw, int32 --> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_msg_send (zmq_msg_t *msg, void *s, int flags);
@@ -131,7 +131,7 @@ my %opttypes = ZMQ_AFFINITY, int64,
 method new(Net::ZMQ4::Context $context, int32 $type) {
     # TODO investigate the reason of hang because of this lock
     # $lock.protect(
-        # {
+    #     {
             my $sock = zmq_socket($context, $type);
             zmq_die() if not $sock;
             $context-count++;
@@ -163,31 +163,16 @@ method close() {
     )
 }
 
-# TODO: There's probably a more Perlish way to handle the flags.
-#multi method send(Str $message, $flags = 0) {
-#    return self.send($message.encode("utf8"), $flags);
-#}
-#
-#multi method send(Blob $buf, $flags = 0) {
-#    my $carr = CArray[int8].new;
-#    for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; }
-#    my $ret = zmq_send(self, $carr, $buf.elems, $flags);
-#    zmq_die if $ret == -1;
-#    return $ret;
-#}
-
-multi method send(Net::ZMQ4::Message $message, $flags = 0) {
-    my $ret = zmq_msg_send($message, self, $flags);
-    zmq_die() if $ret == -1;
-    return $ret;
-}
-
 multi method send(Str $message, $flags = 0) {
-    self.send: Net::ZMQ4::Message.new(:$message), $flags;
+   return self.send($message.encode("utf8"), $flags);
 }
 
-multi method send(Blob[uint8] $message, $flags = 0) {
-    self.send: Net::ZMQ4::Message.new(data => $message), $flags;
+multi method send(Blob $buf, $flags = 0) {
+   my $carr = CArray[int8].new;
+   for $buf.list.kv -> $idx, $val { $carr[$idx] = $val; }
+   my $ret = zmq_send(self, $carr, $buf.elems, $flags);
+   zmq_die if $ret == -1;
+   return $ret;
 }
 
 method sendmore(*@parts) {
