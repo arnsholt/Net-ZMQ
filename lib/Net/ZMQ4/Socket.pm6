@@ -158,6 +158,11 @@ method close() {
         {
             my $ret = zmq_close(self);
             zmq_die() if $ret != 0;
+            CATCH {
+                when .errno == 88 {
+                    # Double-closing is safe
+                }
+            }
             $context-count--;
         }
     )
