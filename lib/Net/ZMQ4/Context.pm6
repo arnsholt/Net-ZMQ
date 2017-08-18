@@ -48,5 +48,5 @@ method term() {
 }
 
 method shutdown() {
-   zmq_die() if zmq_ctx_shutdown(self) != 0;
+    zmq_die() if zmq_ctx_shutdown(self) != 0;
 }
