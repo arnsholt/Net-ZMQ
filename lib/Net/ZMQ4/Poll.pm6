@@ -17,7 +17,7 @@ my sub zmq_poll(Net::ZMQ4::Pollitem, int32, int64 --> int32) is native('zmq',v5)
 # several pollitems repeated in a single CStruct, but that's a hack. to get it
 # working properly, we need NativeCall to support arrays of value structs
 # rather than reference structs.
-my sub poll_one(Net::ZMQ4::Socket $socket, $timeout, Bool :$in, Bool :$out, Bool :$err) is export {
+our sub poll_one(Net::ZMQ4::Socket $socket, $timeout, Bool :$in, Bool :$out, Bool :$err) is export {
     my Net::ZMQ4::Pollitem $pollitem .= new: :$socket, :$in, :$out, :$err;
     my $ret = zmq_poll($pollitem, 1, $timeout);
     if $ret < 0 { die "zmq_poll returned error: $ret" }
