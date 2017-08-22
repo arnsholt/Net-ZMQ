@@ -41,7 +41,7 @@ loop {
 
 # Supported version
 
-Main supported ZMQ version is 4.2.2.
+Main supported ZMQ version is 4.1. Support of 4.2 is planned.
 
 # Issues
 
