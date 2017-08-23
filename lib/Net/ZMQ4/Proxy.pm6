@@ -1,4 +1,5 @@
 use NativeCall;
+unit module Net::ZMQ4::Proxy;
 
 # Message proxing
 # ZMQ_EXPORT int zmq_proxy (void *frontend, void *backend, void *capture);
