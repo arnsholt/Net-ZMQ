@@ -24,7 +24,7 @@ my sub zmq_setsockopt_int64(Net::ZMQ::Socket, int32, CArray[int64], int32 --> in
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
-my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int32, CArray[int8], int32 --> int32)
+my sub zmq_setsockopt_bytes(Net::ZMQ::Socket, int32, CArray[uint8], int32 --> int32)
     is native('zmq',v5)
     is symbol('zmq_setsockopt')
     { * }
@@ -75,15 +75,20 @@ my %opttypes = ZMQ_BACKLOG, int32,
                ZMQ_RCVMORE, int64,
                ZMQ_HWM, int64,
                ZMQ_SWAP, int64,
+               ZMQ_SUBSCRIBE, "bytes",
+               ZMQ_UNSUBSCRIBE, "bytes",
                ZMQ_RATE, int64,
                ZMQ_RECOVERY_IVL, int64,
                ZMQ_RECOVERY_IVL_MSEC, int64,
                ZMQ_MCAST_LOOP, int64,
                ZMQ_SNDBUF, int64,
                ZMQ_RCVBUF, int64,
+               ZMQ_SNDHWM, int,
+               ZMQ_RCVHWM, int,
 
                ZMQ_IDENTITY, "bytes",
-               ZMQ_EVENTS, int32;
+               ZMQ_EVENTS, int32,
+               ZMQ_XPUB_MANUAL, int32;
 
 method new(Net::ZMQ::Context $context, int $type) {
     my $sock = zmq_socket($context, $type);
@@ -101,6 +106,11 @@ method bind(Str $address) {
 
 method connect(Str $address) {
     my $ret = zmq_connect(self, $address);
+    zmq_die() if $ret != 0;
+}
+
+method close() {
+    my $ret = zmq_close(self);
     zmq_die() if $ret != 0;
 }
 
@@ -139,7 +149,7 @@ method receive(int $flags = 0) {
 }
 
 method getopt($opt) {
-    my CArray $optlen = CArray[int].new;
+    my $optlen = CArray[int32].new;
     my $ret;
 
     my CArray $val;
@@ -178,7 +188,7 @@ method getopt($opt) {
 }
 
 method setopt($opt, $value) {
-    my CArray $optlen = CArray[int32].new;
+    my size_t $optlen;
     my $ret;
 
     my CArray $val;
@@ -186,27 +196,30 @@ method setopt($opt, $value) {
         when int {
             $val = CArray[int32].new;
             $val[0] = $value;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_setsockopt_int(self, $opt, $val, $optlen);
         }
         when int32 {
             $val = CArray[int32].new;
             $val[0] = $value;
-            $optlen[0] = 4;
+            $optlen = 4;
             $ret = zmq_setsockopt_int32(self, $opt, $val, $optlen);
         }
         when int64 {
             $val = CArray[int64].new;
             $val[0] = $value;
-            $optlen[0] = 8;
+            $optlen = 8;
             $ret = zmq_setsockopt_int64(self, $opt, $val, $optlen);
         }
         # TODO: bytes
-        #when "bytes" {
-        #    $val = CArray[int8].new;
-        #    $val[0] = $value;
-        #    $ret = zmq_setsockopt_int8(self, $opt, $val, $optlen);
-        #}
+        when "bytes" {
+           $val = CArray[uint8].new;
+           # Memory allocation
+           $val[$value.elems - 1] = 0;
+           die "Send Blob to use $opt" unless $value ~~ Blob;
+           for @$value.kv -> $i, $_ { $val[$i] = $_ }
+           $ret = zmq_setsockopt_bytes(self, $opt, $val, $value.elems);
+        }
         default {
             die "Unknown ZMQ socket option type $opt";
         }

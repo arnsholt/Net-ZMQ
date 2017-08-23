@@ -40,6 +40,9 @@ our constant ZMQ_RECONNECT_IVL     is export(:DEFAULT, :socket-options) = 18;
 our constant ZMQ_BACKLOG           is export(:DEFAULT, :socket-options) = 19;
 our constant ZMQ_RECOVERY_IVL_MSEC is export(:DEFAULT, :socket-options) = 20;
 our constant ZMQ_RECONNECT_IVL_MAX is export(:DEFAULT, :socket-options) = 21;
+our constant ZMQ_SNDHWM            is export(:DEFAULT, :socket-options) = 23;
+our constant ZMQ_RCVHWM            is export(:DEFAULT, :socket-options) = 24;
+our constant ZMQ_XPUB_MANUAL       is export(:DEFAULT, :socket-options) = 71;
 
 # Send/receive options:
 our constant ZMQ_NOBLOCK is export(:DEFAULT, :send-options) = 1;
