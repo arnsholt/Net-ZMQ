@@ -2,17 +2,17 @@ use v6;
 
 use Test;
 
-use Net::ZMQ;
-use Net::ZMQ::Constants;
+use Net::ZMQ4;
+use Net::ZMQ4::Constants;
 
 plan 13;
 
-my Net::ZMQ::Context $ctx .= new();
+my Net::ZMQ4::Context $ctx .= new();
 pass 'creating context';
 
-my Net::ZMQ::Socket $alice .= new($ctx, ZMQ_PAIR); #Net::ZMQ::Constants::ZMQ_PAIR);
+my Net::ZMQ4::Socket $alice .= new($ctx, ZMQ_PAIR);
 pass 'creating socket - imported constant';
-my Net::ZMQ::Socket $bob .= new($ctx, Net::ZMQ::Constants::ZMQ_PAIR); #Net::ZMQ::Constants::ZMQ_PAIR);
+my Net::ZMQ4::Socket $bob .= new($ctx, Net::ZMQ4::Constants::ZMQ_PAIR);
 pass 'creating socket - namespaced constant';
 
 $alice.bind('inproc://alice');
@@ -39,6 +39,4 @@ $msg.close;
 
 $alice.close;
 $bob.close;
-$ctx.terminate;
-
-# vim: ft=perl6
+$ctx.term;
