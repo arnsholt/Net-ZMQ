@@ -43,6 +43,12 @@ loop {
 
 Main supported ZMQ version is 4.1. Support of 4.2 is planned.
 
+# Native dependency
+
+To use this module you need to have native `libzmq` C library
+installed.  You can find installation instructions for a range of
+operating systems at [Official download page](http://zeromq.org/area:download).
+
 # Issues
 
 If you noticed a bug, have a desire to see some feature implemented,
