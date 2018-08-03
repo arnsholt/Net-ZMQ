@@ -20,8 +20,8 @@ $Sharo.send('Kuru Kuru');
 $Sharo.sendmore('Cats', 'Dogs', 'Rabbits');
 
 my $msg = $Rize.receive; # Pure ZMQ message
-say $msg.date;           # bytes
-say $msg.date-str;       # 'Kuru Kuru'
+say $msg.data;           # bytes
+say $msg.data-str;       # 'Kuru Kuru'
 $msg.close;              # Don't forget to close your messages!
 
 # Multi-receive
