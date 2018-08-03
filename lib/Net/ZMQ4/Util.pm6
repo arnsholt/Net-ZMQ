@@ -1,9 +1,9 @@
-unit module Net::ZMQ4::Util;
+unit class Net::ZMQ4::Util;
 
 use NativeCall;
 
 # ZMQ_EXPORT void zmq_version (int *major, int *minor, int *patch);
-sub zmq_version(CArray[int32], CArray[int32], CArray[int32]) is native('zmq',v5) { * }
+our sub zmq_version(int32 is rw, int32 is rw, int32 is rw) is native('zmq',v5) { * }
 # ZMQ_EXPORT int zmq_errno (void);
 sub zmq_errno(--> int32) is native('zmq',v5) { * }
 # ZMQ_EXPORT const char *zmq_strerror (int errnum);
@@ -24,5 +24,13 @@ my sub zmq_die() is export {
 }
 
 our $context-count is export = 0;
+
+method library-version {
+    my int32 $major = 0;
+    my int32 $minor = 0;
+    my int32 $patch = 0;
+    zmq_version($major, $minor, $patch);
+    Version.new($major ~ '.' ~ $minor ~ '.' ~ $patch);
+}
 
 # vim: ft=perl6
