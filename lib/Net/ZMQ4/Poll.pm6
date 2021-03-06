@@ -3,6 +3,7 @@ use Net::ZMQ4::Pollitem;
 use NativeCall;
 
 unit module Net::ZMQ4::Poll;
+use Net::ZMQ4::Util;
 
 # ZMQ_EXPORT int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
 my sub zmq_poll(Net::ZMQ4::Pollitem, int32, int64 --> int32) is native('zmq',v5) { * }
@@ -20,6 +21,6 @@ my sub zmq_poll(Net::ZMQ4::Pollitem, int32, int64 --> int32) is native('zmq',v5)
 our sub poll_one(Net::ZMQ4::Socket $socket, $timeout, Bool :$in, Bool :$out, Bool :$err) is export {
     my Net::ZMQ4::Pollitem $pollitem .= new: :$socket, :$in, :$out, :$err;
     my $ret = zmq_poll($pollitem, 1, $timeout);
-    if $ret < 0 { die "zmq_poll returned error: $ret" }
+    if $ret < 0 { zmq_die }
     return $pollitem.revents;
 }
